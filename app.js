@@ -7,11 +7,10 @@ const hbs = require('hbs');
 const mongoose = require('mongoose');
 const logger = require('morgan');
 const path = require('path');
-
 const app_name = require('./package.json').name;
 const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.')[0]}`);
-
 const app = express();
+const session = require('express-session');
 
 // require database configuration
 require('./configs/db.config');
@@ -23,6 +22,17 @@ app.use(express.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
+
+//express session setup
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    cookie: {
+        sameSite: true,
+        httpOnly: true,
+        maxAge: 60000 //(1min)
+    },
+    rolling: true
+}));
 
 // Express View engine setup
 app.set('views', path.join(__dirname, 'views'));
